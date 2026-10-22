@@ -1,1 +1,25 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Playground - Anuj</title>
+<style>
+body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding:15px;margin:0}
+.box{background:white;color:black;max-width:600px;margin:20px auto;padding:20px;border-radius:16px}
+textarea{width:95%;height:140px;background:#111;color:#0f0;padding:10px;border-radius:8px;font-family:monospace}
+button{background:#6366f1;color:white;padding:14px;border:none;border-radius:10px;width:100%;font-size:17px;font-weight:bold;margin-top:10px}
+#out{background:black;color:#0f0;text-align:left;padding:12px;border-radius:8px;margin-top:12px;min-height:60px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>🐍 Python Playground</h1>
+<p>Made by Anuj Thakur</p>
+<div class="box">
+<textarea id="c">print("Hello Anuj!")
+print("Website is LIVE!")</textarea>
+<button onclick="document.getElementById('out').innerText=document.getElementById('c').value">▶ Run Code</button>
+<div id="out">Output yaha ayega...</div>
+</div>
+</body>
+</html>
