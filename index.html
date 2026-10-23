@@ -2,13 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Python Playground - Anuj</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Playground - Anuj Thakur</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 <style>
-body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding:15px;margin:0}
-.box{background:white;color:black;max-width:600px;margin:20px auto;padding:20px;border-radius:16px}
+body{background:#0f172a;color:white;font-family:sans-serif;text-align:center;padding:20px}
+.box{background:white;color:black;max-width:600px;margin:auto;padding:20px;border-radius:16px}
 textarea{width:95%;height:140px;background:#111;color:#0f0;padding:10px;border-radius:8px;font-family:monospace}
-button{background:#6366f1;color:white;padding:14px;border:none;border-radius:10px;width:100%;font-size:17px;font-weight:bold;margin-top:10px}
+button{background:#6366f1;color:white;padding:12px;border:none;border-radius:10px;width:100%;font-weight:bold;margin-top:10px;font-size:17px}
 #out{background:black;color:#0f0;text-align:left;padding:12px;border-radius:8px;margin-top:12px;min-height:60px;white-space:pre-wrap}
 </style>
 </head>
@@ -17,9 +18,28 @@ button{background:#6366f1;color:white;padding:14px;border:none;border-radius:10p
 <p>Made by Anuj Thakur</p>
 <div class="box">
 <textarea id="c">print("Hello Anuj!")
-print("Website is LIVE!")</textarea>
-<button onclick="document.getElementById('out').innerText=document.getElementById('c').value">▶ Run Code</button>
-<div id="out">Output yaha ayega...</div>
+print("Website is LIVE!")
+for i in range(5):
+    print(i)</textarea>
+<button onclick="run()">▶ Run Code</button>
+<div id="out">Python Loading... 2 sec ruko</div>
 </div>
+<script>
+let py;
+(async()=>{
+  py=await loadPyodide();
+  document.getElementById("out").innerText="Ready ✅ Ab Run dabao!";
+})();
+async function run(){
+  let code=document.getElementById("c").value;
+  let out=document.getElementById("out");
+  out.innerText="Running...\n";
+  try{
+    let t=""; py.setStdout({batched:x=>t+=x+"\n"});
+    await py.runPythonAsync(code);
+    out.innerText=t||"Ho gaya! (No Output)";
+  }catch(e){ out.innerText="Error: "+e; }
+}
+</script>
 </body>
 </html>
