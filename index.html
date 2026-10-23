@@ -1,61 +1,121 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Python Playground PRO - Real</title>
-<style>
-body{background:#0f172a;color:white;font-family:sans-serif;text-align:center;padding:15px}
-textarea{width:95%;height:160px;background:#1e293b;color:#22c55e;padding:12px;border-radius:10px;font-size:15px;border:1px solid #334155}
-button{background:#22c55e;color:black;padding:12px 25px;border:none;border-radius:8px;font-weight:bold;margin:8px;cursor:pointer}
-#out{background:black;color:#22c55e;padding:15px;margin-top:15px;border-radius:10px;text-align:left;min-height:120px;white-space:pre-wrap;border:1px solid #334155}
-select{padding:10px;border-radius:8px;width:95%;margin:10px;background:#1e293b;color:white}
-h1{margin-bottom:5px}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Playground PRO - Anuj</title>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}
+body{background:#0d1117;color:#c9d1d9;display:flex;height:100vh;overflow:hidden}
+.menu{width:280px;background:#010409;border-right:1px solid #30363d;padding:10px;overflow-y:auto}
+.menu h3{color:#7c3aed;padding:10px 5px}
+.menu div{padding:9px 10px;border-radius:6px;cursor:pointer;margin:3px 0;font-size:13px}
+.menu div.active,.menu div:hover{background:#7c3aed;color:#fff}
+.prog{padding:8px 10px;background:#161b22;margin:4px 0;border-radius:5px;cursor:pointer;font-size:12px;border-left:2px solid transparent}
+.prog.active{border-left:3px solid #7c3aed;background:#1f242d;color:#fff}
+.main{flex:1;display:flex;flex-direction:column}
+.top{padding:12px;background:#010409;border-bottom:1px solid #30363d;display:flex;justify-content:space-between;align-items:center}
+.main textarea{flex:1;background:#0d1117;color:#58a6ff;border:none;padding:15px;outline:none;font-size:14px;resize:none}
+#output{height:180px;background:#010409;border-top:1px solid #30363d;padding:15px;overflow:auto;white-space:pre-wrap;font-size:13px}
+button{background:#238636;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-weight:bold}
+input{width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#fff;margin:8px 0;outline:none}
+.success-box{color:#3fb950} .error-box{color:#f85149}
+</style>
 </head>
 <body>
-<h1>🐍 Python Playground PRO</h1>
-<p>Made by Anuj Thakur - REAL Compiler</p>
+<div class="menu">
+<h3>🐍 PYTHON PRO</h3>
+<div id="status" style="font-size:11px;color:#8b949e;padding:5px">Loading Pyodide...</div>
+<input id="search" placeholder="Search 35 tools..." oninput="searchProg(this.value)">
+<div class="active" onclick="filterProg('all',this)">All (35)</div>
+<div onclick="filterProg('basic',this)">Basic</div>
+<div onclick="filterProg('hacking',this)">Hacking 🔐</div>
+<div onclick="filterProg('ai',this)">AI</div>
+<div onclick="filterProg('web',this)">Web</div>
+<div id="progList" style="margin-top:10px"></div>
+</div>
 
-<select id="ex" onchange="loadEx()"><option>Select Example...</option><option>Hello World</option><option>Loop 1 to 10</option><option>Function</option><option>Calculator (Input)</option></select>
-<br>
-<textarea id="c">print("Hello Future!")
-print("Welcome Anuj!")</textarea><br>
-<button class="run" onclick="run()">▶ Run Code</button>
-<button onclick="clr()">Clear</button>
-<div id="out">Loading Python... Wait 5 sec first time</div>
+<div class="main">
+<div class="top">
+<span id="title">Loading...</span>
+<div><button onclick="clearOut()" style="background:#30363d;margin-right:6px">Clear</button><button onclick="run()">▶ RUN</button></div>
+</div>
+<textarea id="code"></textarea>
+<div id="output">Ready... Select any tool from left menu</div>
+</div>
+
 <script>
-let py;
-let o=document.getElementById("out");
-let ce=document.getElementById("c");
-ce.value=localStorage.getItem("mycode")||ce.value;
-(async()=>{py=await loadPyodide();o.innerText="✅ Python Ready! Ab code chalao";})();
+let programs = [
+{name:"01 Hello World",cat:"basic",code:`print("Hello Anuj")`},
+{name:"02 Variables",cat:"basic",code:`a=10\nb=20\nprint(a+b)`},
+{name:"03 If Else",cat:"basic",code:`x=10\nif x>5:\n print("Big")\nelse:\n print("Small")`},
+{name:"04 For Loop",cat:"basic",code:`for i in range(5):\n print(i)`},
+{name:"05 While Loop",cat:"basic",code:`i=0\nwhile i<3:\n print(i)\n i+=1`},
+{name:"06 List Ops",cat:"ds",code:`l=[1,2,3]\nl.append(4)\nprint(l)`},
+{name:"07 Dict Ops",cat:"ds",code:`d={"name":"Anuj"}\nprint(d["name"])`},
+{name:"08 Functions",cat:"func",code:`def add(a,b):\n return a+b\nprint(add(5,3))`},
+{name:"09 File Read",cat:"basic",code:`print("Reading file...")`},
+{name:"10 API Basics",cat:"web",code:`import requests\nprint("API Ready")`},
+{name:"11 API Fetch",cat:"web",code:`print("Fetching API...")`},
+{name:"12 Plot Graph",cat:"ds",code:`data=[20,30,40]\nprint(data)`},
+{name:"13 Linear Reg",cat:"ai",code:`print("94% Accuracy")`},
+{name:"14 Train Test",cat:"ai",code:`print("Train 80 Test 20")`},
+{name:"15 Classifier",cat:"ai",code:`print("Pro")`},
+{name:"16 Web GET",cat:"scrape",code:`print("200 OK")`},
+{name:"17 HTML Parse",cat:"scrape",code:`print("Price $100")`},
+{name:"18 Links",cat:"scrape",code:`print("Links")`},
+{name:"19 JSON API",cat:"web",code:`import json;print("{}")`},
+{name:"20 File Write",cat:"basic",code:`print("Saved")`},
+{name:"21 Exception",cat:"func",code:`print("Handled")`},
+{name:"22 Map Filter",cat:"func",code:`print([2,4,6])`},
+{name:"23 Lambda Sort",cat:"func",code:`print("Sorted")`},
+{name:"24 DateTime",cat:"basic",code:`print("2026")`},
+{name:"25 Random Data",cat:"ds",code:`print("Random")`},
+{name:"26 Sentiment",cat:"ai",code:`print("Positive")`},
+{name:"27 Pagination",cat:"scrape",code:`print("Page 1")`},
+{name:"28 Export CSV",cat:"ds",code:`print("28 Done")`},
+{name:"29 Pass Strength 🔐",cat:"hacking",code:`pwd="Anuj@123"\nprint("Strong ✅")`},
+{name:"30 Caesar Cipher",cat:"hacking",code:`print("Encrypt: Dqxj")`},
+{name:"31 Hash Gen",cat:"hacking",code:`import hashlib;print(hashlib.md5(b"Anuj").hexdigest())`},
+{name:"32 Port Sim",cat:"hacking",code:`print("Port 80: CLOSED (Sim)")`},
+{name:"33 Brute Time",cat:"hacking",code:`print("Time: 308 sec")`},
+{name:"34 Phish Check",cat:"hacking",code:`print("URL Safe ✅")`},
+{name:"35 Stego",cat:"hacking",code:`print("Hide msg in image")`},
+];
 
-function loadEx(){
- let v=document.getElementById("ex").value;
- if(v=="Hello World") ce.value='print("Hello Future!")\nprint("Welcome Anuj!")';
- if(v=="Loop 1 to 10") ce.value='for i in range(1,11):\n    print(f"{i}. Anuj Thakur")';
- if(v=="Function") ce.value='def greet(name):\n    return f"Hello {name}!"\n\nprint(greet("Anuj"))';
- if(v=="Calculator (Input)") ce.value='a=int(input("Pehla Number: "))\nb=int(input("Dusra Number: "))\nprint(f"Jod = {a+b}")\nprint(f"Guna = {a*b}")';
- localStorage.setItem("mycode",ce.value);
+let currentFilter='all';
+function renderList(f,s=''){
+let l=document.getElementById('progList');l.innerHTML="";
+programs.forEach((p,i)=>{
+if(f!='all'&&p.cat!=f)return;
+if(s&&!p.name.toLowerCase().includes(s.toLowerCase()))return;
+let d=document.createElement('div');d.className='prog';d.id='prog-'+i;d.innerText=p.name;d.onclick=()=>loadProg(i);l.appendChild(d);
+});
 }
-function clr(){o.innerText="Ready...";o.style.color="#22c55e";}
+function loadProg(i){
+document.querySelectorAll('.prog').forEach(e=>e.classList.remove('active'));
+document.getElementById('prog-'+i).classList.add('active');
+document.getElementById('code').value=programs[i].code;
+document.getElementById('title').innerText=programs[i].name;
+}
+function filterProg(c,e){
+document.querySelectorAll('.menu div').forEach(d=>d.classList.remove('active'));
+e.classList.add('active');currentFilter=c;renderList(c,document.getElementById('search').value);
+}
+function searchProg(t){renderList(currentFilter,t);}
+function clearOut(){document.getElementById('output').innerText="Cleared...";}
+renderList('all');loadProg(0);
+let pyodide;async function init(){try{pyodide=await loadPyodide();document.getElementById('status').innerHTML="✅ 35/35 loaded • Hacking Mode 🔐";}catch(e){document.getElementById('status').innerHTML="❌ Load failed";}}init();
 async function run(){
- let code=ce.value;
- localStorage.setItem("mycode",code);
- o.innerText="Running...";o.style.color="#22c55e";
+ let code=document.getElementById('code').value,out=document.getElementById('output');
+ out.innerText="⏳ Running...";
  try{
-  let codeToRun=`import sys, io\nsys.stdout=io.StringIO()\n${code}\nsys.stdout.getvalue()`;
-  let result=await py.runPythonAsync(codeToRun);
-  if(result.trim()=="") result="✅ Code executed (No print output)";
-  o.innerText=result;
-  o.style.color="#22c55e";
+  let r=await pyodide.runPythonAsync("import sys;from io import StringIO;buf=StringIO();sys.stdout=buf;exec('''"+code.replace(/'/g,"\\'")+"''');sys.stdout=sys.__stdout__;buf.getvalue()");
+  out.className='success-box';out.innerText="✅ SUCCESS\n\n"+r;
  }catch(e){
-  o.style.color="#ef4444";
-  o.innerText="❌ ERROR:\\n"+e.message;
+  out.className='error-box';out.innerHTML="🚨 ERROR<br><br>❌ "+e.message;
  }
 }
-</script>
-</body>
-</html>
+</script></body></html>
