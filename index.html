@@ -1,45 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Python Playground - Anuj Thakur</title>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-<style>
-body{background:#0f172a;color:white;font-family:sans-serif;text-align:center;padding:20px}
-.box{background:white;color:black;max-width:600px;margin:auto;padding:20px;border-radius:16px}
-textarea{width:95%;height:140px;background:#111;color:#0f0;padding:10px;border-radius:8px;font-family:monospace}
-button{background:#6366f1;color:white;padding:12px;border:none;border-radius:10px;width:100%;font-weight:bold;margin-top:10px;font-size:17px}
-#out{background:black;color:#0f0;text-align:left;padding:12px;border-radius:8px;margin-top:12px;min-height:60px;white-space:pre-wrap}
-</style>
-</head>
-<body>
-<h1>🐍 Python Playground</h1>
-<p>Made by Anuj Thakur</p>
-<div class="box">
-<textarea id="c">print("Hello Anuj!")
-print("Website is LIVE!")
-for i in range(5):
-    print(i)</textarea>
-<button onclick="run()">▶ Run Code</button>
-<div id="out">Python Loading... 2 sec ruko</div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Python Playground PRO - Anuj</title><script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script><style>body{background:#0f172a;color:white;font-family:sans-serif;text-align:center;padding:10px}.main{max-width:700px;margin:auto;background:white;color:black;padding:18px;border-radius:20px}textarea{width:96%;height:160px;background:#0f172a;color:#22c55e;padding:10px;border-radius:10px;font-family:monospace;font-size:15px}button{padding:10px 14px;border:none;border-radius:8px;font-weight:bold;margin:4px;cursor:pointer}.run{background:#6366f1;color:white;width:100%;font-size:18px;padding:13px;margin-top:8px}.small{background:#e2e8f0}select{padding:8px;border-radius:8px;width:100%;margin-bottom:8px}#out{background:black;color:#0f0;text-align:left;padding:12px;border-radius:8px;margin-top:10px;min-height:70px;white-space:pre-wrap;font-family:monospace}</style></head><body>
+<h1>🐍 Python Playground PRO</h1><p>Made by Anuj Thakur</p>
+<div class="main">
+<select id="ex" onchange="loadEx()"><option>Select Example...</option><option value="print('Hello Anuj!')">Hello World</option><option value="for i in range(1,11):\n    print(i)">Loop 1 to 10</option><option value="def add(a,b):\n    return a+b\nprint(add(5,10))">Function</option><option value="a=int(input('Num1: '))\nb=int(input('Num2: '))\nprint('Sum:',a+b)">Calculator</option></select>
+<textarea id="c">print("Hello Future!")
+print("Welcome Anuj!")</textarea>
+<button class="run" onclick="run()">▶ Run Code</button>
+<div><button class="small" onclick="clr()">Clear Output</button><button class="small" onclick="save()">💾 Save</button><button class="small" onclick="share()">🔗 Share</button></div>
+<div id="out">Loading Python... Wait 3 sec</div>
 </div>
 <script>
-let py;
-(async()=>{
-  py=await loadPyodide();
-  document.getElementById("out").innerText="Ready ✅ Ab Run dabao!";
-})();
-async function run(){
-  let code=document.getElementById("c").value;
-  let out=document.getElementById("out");
-  out.innerText="Running...\n";
-  try{
-    let t=""; py.setStdout({batched:x=>t+=x+"\n"});
-    await py.runPythonAsync(code);
-    out.innerText=t||"Ho gaya! (No Output)";
-  }catch(e){ out.innerText="Error: "+e; }
-}
-</script>
-</body>
-</html>
+let py;const c=document.getElementById("c");const o=document.getElementById("out");
+c.value=localStorage.getItem("mycode")||c.value;
+(async()=>{py=await loadPyodide();o.innerText="Ready ✅ Ab Run dabao!";})();
+async function run(){let txt="";o.innerText="Running...\n";try{py.setStdout({batched:x=>txt+=x+"\n"});py.setStderr({batched:x=>txt+=x+"\n"});let code=c.value;if(code.includes("input")){let v=prompt("Input daalo:");py.globals.set("input",()=>v)}await py.runPythonAsync(code);o.innerText=txt||"Done!";}catch(e){o.innerText="Error: "+e}}function clr(){o.innerText="Cleared!"}function save(){localStorage.setItem("mycode",c.value);alert("Code Saved! ✅")}function share(){navigator.clipboard.writeText(window.location.href);alert("Link Copied!")}function loadEx(){let v=document.getElementById("ex").value;if(v!="Select Example...")c.value=v.replace(/\\n/g,"\n")}
+</script></body></html>
